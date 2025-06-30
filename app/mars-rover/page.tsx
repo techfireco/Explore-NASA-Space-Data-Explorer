@@ -54,11 +54,9 @@ const MarsRoverPage = () => {
   const { apiKey } = useAPIKey()
 
   const rovers = [
-    { id: 'curiosity', name: 'Curiosity', description: 'Nuclear-powered rover exploring Gale Crater since 2012' },
-    { id: 'opportunity', name: 'Opportunity', description: 'Solar-powered rover that operated from 2004-2018' },
-    { id: 'spirit', name: 'Spirit', description: 'Solar-powered rover that operated from 2004-2010' },
-    { id: 'perseverance', name: 'Perseverance', description: 'Latest rover with helicopter companion, landed 2021' },
-    { id: 'ingenuity', name: 'Ingenuity', description: 'Mars helicopter companion to Perseverance' }
+    { id: 'curiosity', name: 'Curiosity', description: 'Nuclear-powered rover exploring Gale Crater since 2012. Active mission with comprehensive camera suite.' },
+    { id: 'opportunity', name: 'Opportunity', description: 'Solar-powered rover that operated from 2004-2018. Mission ended due to dust storm.' },
+    { id: 'spirit', name: 'Spirit', description: 'Solar-powered rover that operated from 2004-2010. Twin rover to Opportunity.' }
   ]
 
   const cameras = {
@@ -84,27 +82,8 @@ const MarsRoverPage = () => {
       { id: 'NAVCAM', name: 'Navigation Camera' },
       { id: 'PANCAM', name: 'Panoramic Camera' },
       { id: 'MINITES', name: 'Miniature Thermal Emission Spectrometer' }
-    ],
-    perseverance: [
-      { id: 'EDL_RUCAM', name: 'Rover Up-Look Camera' },
-      { id: 'EDL_RDCAM', name: 'Rover Down-Look Camera' },
-      { id: 'EDL_DDCAM', name: 'Descent Stage Down-Look Camera' },
-      { id: 'EDL_PUCAM1', name: 'Parachute Up-Look Camera A' },
-      { id: 'EDL_PUCAM2', name: 'Parachute Up-Look Camera B' },
-      { id: 'NAVCAM_LEFT', name: 'Navigation Camera - Left' },
-      { id: 'NAVCAM_RIGHT', name: 'Navigation Camera - Right' },
-      { id: 'MCZ_LEFT', name: 'Mast Camera Zoom - Left' },
-      { id: 'MCZ_RIGHT', name: 'Mast Camera Zoom - Right' },
-      { id: 'FRONT_HAZCAM_LEFT_A', name: 'Front Hazard Camera - Left' },
-      { id: 'FRONT_HAZCAM_RIGHT_A', name: 'Front Hazard Camera - Right' },
-      { id: 'REAR_HAZCAM_LEFT', name: 'Rear Hazard Camera - Left' },
-      { id: 'REAR_HAZCAM_RIGHT', name: 'Rear Hazard Camera - Right' }
-    ],
-    ingenuity: [
-      { id: 'NAV', name: 'Navigation Camera' },
-      { id: 'RTE', name: 'Return to Earth Camera' }
     ]
-  }
+  } as const
 
   useEffect(() => {
     const loadManifest = async () => {
@@ -168,11 +147,20 @@ const MarsRoverPage = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="section-title">Mars Rover Explorer</h1>
+          <h1 className="section-title">Mars Rover Photos</h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Explore the Red Planet through the eyes of NASA's Mars rovers. 
-            View photos from different cameras and mission days.
+            Image data gathered by NASA's Curiosity, Opportunity, and Spirit rovers on Mars. 
+            Photos are organized by sol (Martian day) and can be filtered by camera and Earth date.
           </p>
+          <div className="mt-4 p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg max-w-4xl mx-auto">
+            <p className="text-blue-300 text-sm mb-2">
+              <strong>API Information:</strong> Photos are limited to 25 per page. Each camera has a unique function and perspective.
+            </p>
+            <p className="text-gray-300 text-sm">
+              Sol counting starts from each rover's landing date. Use the manifest to find available sols and cameras for each rover.
+              API maintained by <a href="https://github.com/chrisccerami/mars-photo-api" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline">Chris Cerami</a>.
+            </p>
+          </div>
         </div>
 
         {/* Rover Selection */}
@@ -318,19 +306,62 @@ const MarsRoverPage = () => {
           <div className="card text-center">
             <h3 className="text-xl font-bold text-red-400 mb-4">Error Loading Photos</h3>
             <p className="text-gray-300 mb-6">{error}</p>
-            <button onClick={loadPhotos} className="btn-primary">
-              Try Again
-            </button>
+            
+            <div className="bg-gray-800 rounded-lg p-4 mb-6 text-left">
+              <h4 className="text-lg font-semibold text-blue-400 mb-3">Common Issues & Solutions:</h4>
+              <ul className="text-gray-300 space-y-2 text-sm">
+                <li>• <strong>No photos found:</strong> The rover may not have taken photos on the selected sol/date with the chosen camera</li>
+                <li>• <strong>Network errors:</strong> Check your internet connection or try again in a few minutes</li>
+                <li>• <strong>Rate limiting:</strong> The API allows 2000 requests per hour - wait before retrying</li>
+                <li>• <strong>Invalid parameters:</strong> Ensure sol numbers are within the rover's mission range</li>
+              </ul>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <button onClick={loadPhotos} className="btn-primary">
+                Try Again
+              </button>
+              <a 
+                href="https://mars.nasa.gov/mars-exploration/missions/" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="btn-secondary"
+              >
+                View Mission Info
+              </a>
+            </div>
           </div>
         ) : photos.length === 0 ? (
           <div className="card text-center">
             <h3 className="text-xl font-bold text-gray-400 mb-4">No Photos Found</h3>
             <p className="text-gray-300 mb-6">
-              No photos found for the selected filters. Try adjusting your search criteria.
+              No photos found for the selected filters. The rover may not have taken photos on this sol/date with the chosen camera.
             </p>
-            <button onClick={clearFilters} className="btn-secondary">
-              Clear Filters
-            </button>
+            
+            <div className="bg-gray-800 rounded-lg p-4 mb-6 text-left">
+              <h4 className="text-lg font-semibold text-blue-400 mb-3">Search Tips:</h4>
+              <ul className="text-gray-300 space-y-2 text-sm">
+                <li>• <strong>Try different sols:</strong> Each rover has thousands of sols with varying photo activity</li>
+                <li>• <strong>Change camera:</strong> Different cameras were used on different sols for various purposes</li>
+                <li>• <strong>Use Earth dates:</strong> Try searching by Earth date instead of sol number</li>
+                <li>• <strong>Check rover status:</strong> Some rovers have limited operational periods</li>
+                <li>• <strong>Popular sols:</strong> Try sol 1000+ for Curiosity, sol 1-100 for Spirit/Opportunity</li>
+              </ul>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <button onClick={clearFilters} className="btn-secondary">
+                Clear All Filters
+              </button>
+              <a 
+                href="https://mars.nasa.gov/msl/multimedia/raw-images/" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="btn-primary"
+              >
+                Browse Official Gallery
+              </a>
+            </div>
           </div>
         ) : (
           <div className={`grid gap-6 ${

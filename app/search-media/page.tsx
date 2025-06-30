@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Search, Play, Download, ExternalLink, Calendar, User, Filter, Grid, List, Image as ImageIcon, Video } from 'lucide-react'
+import { Search, Play, Download, ExternalLink, Calendar, User, Filter, Grid, List, Image as ImageIcon, Video, X } from 'lucide-react'
 import { searchNASAMedia } from '@/lib/api'
 import { format } from 'date-fns'
 
@@ -200,36 +200,90 @@ const SearchMediaPage = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="section-title">NASA Media Search</h1>
+          <h1 className="section-title">NASA Image and Video Library</h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Search through NASA's vast collection of images, videos, and audio files. 
-            Discover stunning space photography, mission footage, and educational content.
+            Access NASA's comprehensive collection of space images, videos, and audio files from images.nasa.gov. 
+            Search through thousands of high-quality media assets from missions, research, and educational content.
           </p>
+          
+          {/* API Information */}
+          <div className="bg-gray-800 rounded-lg p-6 mt-8 text-left max-w-4xl mx-auto">
+            <h2 className="text-2xl font-bold text-blue-400 mb-4">API Information</h2>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <h3 className="text-lg font-semibold text-white mb-3">Available Endpoints</h3>
+                <ul className="text-gray-300 space-y-2 text-sm">
+                  <li>• <strong>GET /search:</strong> Search media assets by query and filters</li>
+                  <li>• <strong>GET /asset/{'{nasa_id}'}:</strong> Retrieve media asset manifest</li>
+                  <li>• <strong>GET /metadata/{'{nasa_id}'}:</strong> Get metadata location</li>
+                  <li>• <strong>GET /captions/{'{nasa_id}'}:</strong> Access video captions</li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-white mb-3">Search Features</h3>
+                <ul className="text-gray-300 space-y-2 text-sm">
+                  <li>• <strong>Media Types:</strong> Images, videos, and audio files</li>
+                  <li>• <strong>Date Filtering:</strong> Search by year range</li>
+                  <li>• <strong>Pagination:</strong> Browse through large result sets</li>
+                  <li>• <strong>REST API:</strong> JSON responses with predictable URLs</li>
+                </ul>
+              </div>
+            </div>
+            <div className="mt-4 pt-4 border-t border-gray-700">
+              <p className="text-gray-400 text-sm">
+                <strong>Data Source:</strong> Official NASA Image and Video Library API • 
+                <a href="https://images.nasa.gov" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">
+                  Visit images.nasa.gov
+                </a>
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Search Controls */}
         <div className="card mb-8">
           <div className="space-y-6">
             {/* Main Search */}
-            <div className="flex space-x-4">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Search for space images, videos, missions..."
-                  className="input-field pl-10 w-full"
-                />
+            <div className="space-y-3">
+              <div className="flex space-x-4">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="Search for space images, videos, missions..."
+                    className="input-field pl-10 w-full"
+                  />
+                </div>
+                <button
+                  onClick={() => handleSearch(1)}
+                  disabled={loading || !searchQuery.trim()}
+                  className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? 'Searching...' : 'Search'}
+                </button>
               </div>
-              <button
-                onClick={() => handleSearch(1)}
-                disabled={loading || !searchQuery.trim()}
-                className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? 'Searching...' : 'Search'}
-              </button>
+              
+              {/* Quick Search Suggestions */}
+              {!hasSearched && (
+                <div className="flex flex-wrap gap-2">
+                  <span className="text-sm text-gray-400">Popular searches:</span>
+                  {['Mars', 'ISS', 'Hubble', 'Apollo 11', 'Earth', 'Jupiter', 'Curiosity', 'SpaceX'].map((suggestion) => (
+                    <button
+                      key={suggestion}
+                      onClick={() => {
+                        setSearchQuery(suggestion)
+                        handleSearch(1)
+                      }}
+                      className="px-3 py-1 text-xs bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-full transition-colors"
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Filters */}
@@ -310,6 +364,23 @@ const SearchMediaPage = () => {
                 </div>
               </div>
             </div>
+            
+            {/* Clear Filters Button */}
+            {(mediaType !== 'all' || yearStart || yearEnd) && (
+              <div className="flex justify-center pt-4 border-t border-gray-700">
+                <button
+                  onClick={() => {
+                    setMediaType('all')
+                    setYearStart('')
+                    setYearEnd('')
+                  }}
+                  className="btn-secondary flex items-center space-x-2"
+                >
+                  <X className="h-4 w-4" />
+                  <span>Clear Filters</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -346,9 +417,31 @@ const SearchMediaPage = () => {
           <div className="card text-center">
             <h3 className="text-xl font-bold text-red-400 mb-4">Search Error</h3>
             <p className="text-gray-300 mb-6">{error}</p>
-            <button onClick={() => handleSearch(currentPage)} className="btn-primary">
-              Try Again
-            </button>
+            
+            <div className="bg-gray-800 rounded-lg p-4 mb-6 text-left">
+              <h4 className="text-lg font-semibold text-blue-400 mb-3">Troubleshooting Tips:</h4>
+              <ul className="text-gray-300 space-y-2 text-sm">
+                <li>• <strong>Network issues:</strong> Check your internet connection and try again</li>
+                <li>• <strong>Search terms:</strong> Try simpler keywords or remove special characters</li>
+                <li>• <strong>Rate limiting:</strong> Wait a moment before making another search</li>
+                <li>• <strong>Server issues:</strong> The NASA API may be temporarily unavailable</li>
+                <li>• <strong>Filter conflicts:</strong> Try clearing filters and searching again</li>
+              </ul>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <button onClick={() => handleSearch(currentPage)} className="btn-primary">
+                Try Again
+              </button>
+              <a 
+                href="https://images.nasa.gov" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="btn-secondary"
+              >
+                Visit Official Site
+              </a>
+            </div>
           </div>
         )}
 
@@ -357,19 +450,56 @@ const SearchMediaPage = () => {
           <div className="card text-center">
             <h3 className="text-xl font-bold text-gray-400 mb-4">No Results Found</h3>
             <p className="text-gray-300 mb-6">
-              No media found for your search criteria. Try different keywords or adjust your filters.
+              No media found for your search criteria. The NASA Image and Video Library contains thousands of assets - try adjusting your search.
             </p>
-            <button
-              onClick={() => {
-                setSearchQuery('')
-                setMediaType('all')
-                setYearStart('')
-                setYearEnd('')
-              }}
-              className="btn-secondary"
-            >
-              Clear Filters
-            </button>
+            
+            <div className="bg-gray-800 rounded-lg p-4 mb-6 text-left">
+              <h4 className="text-lg font-semibold text-blue-400 mb-3">Search Suggestions:</h4>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <h5 className="text-white font-medium mb-2">Popular Topics:</h5>
+                  <ul className="text-gray-300 space-y-1 text-sm">
+                    <li>• "Mars" - Red planet exploration</li>
+                    <li>• "ISS" - International Space Station</li>
+                    <li>• "Hubble" - Space telescope images</li>
+                    <li>• "Apollo" - Moon landing missions</li>
+                    <li>• "Earth" - Our planet from space</li>
+                  </ul>
+                </div>
+                <div>
+                  <h5 className="text-white font-medium mb-2">Search Tips:</h5>
+                  <ul className="text-gray-300 space-y-1 text-sm">
+                    <li>• Use simple, descriptive keywords</li>
+                    <li>• Try mission names (e.g., "Curiosity")</li>
+                    <li>• Search for celestial objects (e.g., "Jupiter")</li>
+                    <li>• Remove year filters for broader results</li>
+                    <li>• Try different media types</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <button
+                onClick={() => {
+                  setSearchQuery('')
+                  setMediaType('all')
+                  setYearStart('')
+                  setYearEnd('')
+                }}
+                className="btn-secondary"
+              >
+                Clear All Filters
+              </button>
+              <a 
+                href="https://images.nasa.gov/search-results?q=mars&media=image" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="btn-primary"
+              >
+                Browse Popular Content
+              </a>
+            </div>
           </div>
         )}
 

@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowRight, Calendar, Camera, ExternalLink, Globe, Lightbulb, Search, Eye, Thermometer, Zap } from 'lucide-react';
+import { ArrowRight, Calendar, Camera, ExternalLink, Globe, Lightbulb, Search, Eye, Thermometer, Zap, Satellite, Microscope } from 'lucide-react';
 import { useAPIKey } from '@/contexts/APIKeyContext'
 import { fetchAPOD } from '@/lib/api'
 
@@ -84,6 +84,20 @@ const HomePage = () => {
       description: 'Monitor natural disasters and events happening on Earth.',
       href: '/events',
       color: 'from-emerald-500 to-cyan-600'
+    },
+    {
+      icon: Satellite,
+      title: 'Earth Imagery',
+      description: 'View full-disc Earth images from DSCOVR\'s EPIC camera.',
+      href: '/earth-imagery',
+      color: 'from-blue-500 to-green-600'
+    },
+    {
+      icon: Microscope,
+      title: 'Space Biology',
+      description: 'Explore NASA\'s Open Science Data Repository for space biology and life sciences research.',
+      href: '/space-biology',
+      color: 'from-violet-500 to-purple-600'
     }
   ]
 

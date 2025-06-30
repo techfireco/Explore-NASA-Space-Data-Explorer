@@ -81,7 +81,21 @@ const MarsWeatherPage = () => {
         setSelectedSol(transformedData[0])
       }
     } catch (error: any) {
-      setError('Failed to load Mars weather data. The InSight mission has ended, so recent data may not be available.')
+      console.error('Mars weather API error:', error)
+      
+      let errorMessage = 'Failed to load Mars weather data.'
+      
+      if (error.response?.status === 404) {
+        errorMessage = 'Mars weather API endpoint not found. The InSight mission has ended and the service may have been discontinued.'
+      } else if (error.response?.status >= 500) {
+        errorMessage = 'Mars weather API server error. The service may be temporarily unavailable.'
+      } else if (error.message?.includes('Network Error')) {
+        errorMessage = 'Network error occurred. Please check your internet connection and try again.'
+      } else {
+        errorMessage = 'The InSight mission ended in December 2022. Historical data may be limited or unavailable due to power management issues during the mission.'
+      }
+      
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -166,17 +180,31 @@ const MarsWeatherPage = () => {
       <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
           <div className="card">
-            <h1 className="text-2xl font-bold text-red-400 mb-4">Mars Weather Data Unavailable</h1>
+            <h1 className="text-2xl font-bold text-red-400 mb-4">InSight Mars Weather Data Unavailable</h1>
             <p className="text-gray-300 mb-6">{error}</p>
             <div className="bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-4 mb-6">
-              <p className="text-yellow-300 text-sm">
-                <strong>Note:</strong> The NASA InSight mission ended in December 2022. 
-                Historical weather data from Mars may still be available, but real-time updates are no longer provided.
+              <p className="text-yellow-300 text-sm mb-3">
+                <strong>About Missing Data:</strong> The InSight mission experienced significant data gaps due to power management needs.
+                Dust storms and seasonal changes affected the lander's solar panels, requiring careful power conservation.
+              </p>
+              <p className="text-gray-300 text-sm">
+                For detailed information about data availability and mission status, visit the official 
+                <a href="https://mars.nasa.gov/insight/weather/" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline ml-1">
+                  InSight Weather page
+                </a> or submit feedback at 
+                <a href="https://mars.nasa.gov/feedback/" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline ml-1">
+                  mars.nasa.gov/feedback
+                </a>
               </p>
             </div>
-            <button onClick={loadWeatherData} className="btn-primary">
-              Try Again
-            </button>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button onClick={loadWeatherData} className="btn-primary">
+                Try Again
+              </button>
+              <a href="https://mars.nasa.gov/insight/weather/" target="_blank" rel="noopener noreferrer" className="btn-secondary">
+                View Official Data
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -188,13 +216,29 @@ const MarsWeatherPage = () => {
       <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
           <div className="card">
-            <h1 className="text-2xl font-bold text-gray-400 mb-4">No Weather Data Available</h1>
+            <h1 className="text-2xl font-bold text-yellow-400 mb-4">No Weather Data Available</h1>
             <p className="text-gray-300 mb-6">
-              No Mars weather data is currently available. The InSight mission has ended.
+              No Mars weather data is currently available. The InSight API provides per-Sol summary data for the last seven available Sols (Martian Days).
             </p>
-            <button onClick={loadWeatherData} className="btn-secondary">
-              Refresh
-            </button>
+            <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4 mb-6">
+              <p className="text-blue-300 text-sm mb-2">
+                <strong>About Data Availability:</strong>
+              </p>
+              <ul className="text-left text-gray-300 text-sm space-y-1">
+                <li>• Data values may change as more information is downlinked from the spacecraft</li>
+                <li>• Wind and sensor data may not exist for certain date ranges</li>
+                <li>• Power management requirements caused significant data gaps</li>
+                <li>• Dust storms affected solar panel efficiency and data collection</li>
+              </ul>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button onClick={loadWeatherData} className="btn-primary">
+                Refresh
+              </button>
+              <a href="https://mars.nasa.gov/insight/weather/" target="_blank" rel="noopener noreferrer" className="btn-secondary">
+                View Seasonal Report
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -206,13 +250,19 @@ const MarsWeatherPage = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="section-title">Mars Weather</h1>
+          <h1 className="section-title">InSight: Mars Weather Service</h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Historical weather data from Mars collected by NASA's InSight lander. 
-            Explore temperature, pressure, and atmospheric conditions on the Red Planet.
+            Weather data from Mars collected by NASA's InSight lander at Elysium Planitia. 
+            Continuous measurements of temperature, wind, and pressure on the Martian surface.
           </p>
-          <div className="mt-4 text-sm text-yellow-300">
-            ⚠️ InSight mission ended in December 2022. Showing historical data.
+          <div className="mt-4 p-4 bg-yellow-900/20 border border-yellow-500/30 rounded-lg max-w-4xl mx-auto">
+            <p className="text-yellow-300 text-sm mb-2">
+              <strong>⚠️ Mission Status:</strong> InSight mission ended in December 2022. This service has significant missing data due to InSight needing to manage power use.
+            </p>
+            <p className="text-gray-300 text-sm">
+              Dust storms and distance from the sun affected InSight's power situation, resulting in data gaps. 
+              For more information, visit <a href="https://mars.nasa.gov/insight/weather/" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline">mars.nasa.gov/insight/weather</a>
+            </p>
           </div>
         </div>
 

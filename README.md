@@ -47,8 +47,8 @@ A modern web application built with Next.js that allows users to explore NASA's 
    
    The project is already configured with your NASA API key in `.env.local`:
    ```env
-   NASA_API_KEY=fEpgqxsFEeBG1NkwYdhyOo7617oc545o5Lugbdau
-   NEXT_PUBLIC_NASA_API_KEY=fEpgqxsFEeBG1NkwYdhyOo7617oc545o5Lugbdau
+   NASA_API_KEY=
+   NEXT_PUBLIC_NASA_API_KEY=
    ```
 
 4. **Run the development server**

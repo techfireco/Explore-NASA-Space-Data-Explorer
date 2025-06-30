@@ -12,7 +12,7 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
-          <div className="col-span-1 md:col-span-2">
+          <div className="col-span-1 md:col-span-1">
             <Link href="/" className="flex items-center space-x-2 group mb-4">
               <Rocket className="h-8 w-8 text-space-400 group-hover:text-space-300 transition-colors" />
               <span className="text-xl font-bold text-gradient">Explore NASA</span>
@@ -110,17 +110,50 @@ const Footer = () => {
               </li>
             </ul>
           </div>
+
+          {/* Legal */}
+          <div>
+            <h3 className="text-white font-semibold mb-4">Legal</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/about" className="text-gray-400 hover:text-space-400 transition-colors">
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link href="/privacy" className="text-gray-400 hover:text-space-400 transition-colors">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/terms" className="text-gray-400 hover:text-space-400 transition-colors">
+                  Terms of Service
+                </Link>
+              </li>
+              <li>
+                <a 
+                  href="https://github.com/techfireco" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-space-400 transition-colors flex items-center space-x-1"
+                >
+                  <span>Source Code</span>
+                  <ExternalLink className="h-3 w-3" />
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
 
         {/* Bottom Bar */}
         <div className="border-t border-gray-700/50 mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center">
           <div className="text-gray-400 text-sm mb-4 sm:mb-0">
-            © {currentYear} Explore NASA. Built with NASA's Open Data APIs.
+            © {currentYear} Explore NASA. Created by <span className="text-space-400">Md Kashif Ali</span>. Built with NASA's Open Data APIs.
           </div>
           
           <div className="flex items-center space-x-4">
             <a 
-              href="https://github.com" 
+              href="https://github.com/techfireco" 
               target="_blank" 
               rel="noopener noreferrer"
               className="text-gray-400 hover:text-white transition-colors"

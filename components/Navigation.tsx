@@ -47,6 +47,13 @@ const Navigation = () => {
         { href: '/asteroids', label: 'Asteroids' },
         { href: '/space-biology', label: 'Space Biology' },
       ]
+    },
+    {
+      label: 'Info',
+      icon: Key,
+      items: [
+        { href: '/about', label: 'About Us' },
+      ]
     }
   ]
 
